@@ -67,6 +67,7 @@ st.markdown(f"""
 
 
 # ---------------------------------------------------------
+
 # 2. DATA LOADING & PREPROCESSING (DISESUAIKAN DENGAN PPT)
 # ---------------------------------------------------------
 @st.cache_data
@@ -95,14 +96,28 @@ def load_data():
             'children': children, 'smoker': smoker,
             'region': region, 'charges': np.round(charges, 2)
         })
+
+    # --- PERBAIKAN: Bersihkan nama kolom & konversi tipe data angka ---
+    df.columns = df.columns.str.strip().str.lower()
+
+    if 'charges' in df.columns:
+        # Menghapus titik/koma format teks agar bisa dihitung sebagai angka (float)
+        df['charges'] = df['charges'].astype(str).str.replace('.', '', regex=False).str.replace(',', '.', regex=False)
+        df['charges'] = pd.to_numeric(df['charges'], errors='coerce')
+
+    for col in ['age', 'bmi', 'children']:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
     return df
 
+# Load data & buat dataframe yang sudah di-encode
 df_raw = load_data()
-df_raw.columns = df_raw.columns.str.strip().str.lower()
-df_encoded = pd.get_dummies(df_raw, columns=['sex', 'smoker', 'region'], drop_first=True)
 
+# Pastikan kolom kategorikal ada sebelum menjalankan get_dummies
+cat_cols = [col for col in ['sex', 'smoker', 'region'] if col in df_raw.columns]
+df_encoded = pd.get_dummies(df_raw, columns=cat_cols, drop_first=True)
 
-# ---------------------------------------------------------
 # 3. SIDEBAR FILTER & HEADER
 # ---------------------------------------------------------
 st.title("📊 Dashboard Prediksi & Analisis Biaya Medis Asuransi")
