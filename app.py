@@ -98,6 +98,7 @@ def load_data():
     return df
 
 df_raw = load_data()
+df_raw.columns = df_raw.columns.str.strip().str.lower()
 df_encoded = pd.get_dummies(df_raw, columns=['sex', 'smoker', 'region'], drop_first=True)
 
 
