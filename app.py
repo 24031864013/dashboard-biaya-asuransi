@@ -72,7 +72,7 @@ st.markdown(f"""
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("insurance.csv")
+        df = pd.read_csv("insurance.csv, sep=";")
         df = df.drop_duplicates()
     except FileNotFoundError:
         np.random.seed(42)
